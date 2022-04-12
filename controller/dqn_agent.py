@@ -7,7 +7,7 @@ import numpy as np
 import time
 
 from .qagent import QAgent
-from world.maze import Maze
+from game.SpaceInvaders import SpaceInvaders
 from epsilon_profile import EpsilonProfile
 
 
@@ -24,8 +24,8 @@ class DQNAgent(QAgent):
         Il doit stocker les différents paramètres nécessaires au fonctionnement 
         de l'algorithme et initialiser la fonction de valeur d'action, notée Q.
 
-        :param maze: Le labyrinthe à résoudre 
-        :type maze: Maze
+        :param SpaceInvaders: Le labyrinthe à résoudre 
+        :type SpaceInvaders: SpaceInvaders
         :param eps_profile: Le profil du paramètre d'exploration epsilon 
         :type eps_profile: EpsilonProfile
         :param gamma: Le facteur d'atténuation
@@ -64,11 +64,11 @@ class DQNAgent(QAgent):
         # Méthode de descente de gradient
         self.optimizer = optim.Adam(self.policy_net.parameters(), lr=self.alpha)
 
-    def init_replay_memory(self, env: Maze):
+    def init_replay_memory(self, env: SpaceInvaders):
         """Cette méthode initialise le buffer d'expérience replay.
 
         :param env: Environnement (le labyrinthe)
-        :type env: Maze
+        :type env: SpaceInvaders
         """
         # Replay memory pour s, a, r, terminal, and sn
         self.Ds = np.zeros([self.replay_memory_size, env.nf, env.ny, env.nx], dtype=np.float32)
