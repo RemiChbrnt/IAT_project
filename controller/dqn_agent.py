@@ -70,12 +70,13 @@ class DQNAgent(QAgent):
         :param env: Environnement (le labyrinthe)
         :type env: SpaceInvaders
         """
+        npx, nix, niy, nby, nbool = env.get_nstate()
         # Replay memory pour s, a, r, terminal, and sn
-        self.Ds = np.zeros([self.replay_memory_size, env.nf, env.ny, env.nx], dtype=np.float32)
+        self.Ds = np.zeros([self.replay_memory_size, npx, nix, niy, nby, nbool], dtype=np.float32)
         self.Da = np.zeros([self.replay_memory_size, env.na], dtype=np.float32)
         self.Dr = np.zeros([self.replay_memory_size], dtype=np.float32)
         self.Dt = np.zeros([self.replay_memory_size], dtype=np.float32)
-        self.Dsn = np.zeros([self.replay_memory_size, env.nf, env.ny, env.nx], dtype=np.float32)
+        self.Dsn = np.zeros([self.replay_memory_size, npx, nix, niy, nby, nbool], dtype=np.float32)
 
         self.d = 0     # counter for storing in D
         self.ds = 0    # total number of steps
@@ -91,7 +92,8 @@ class DQNAgent(QAgent):
         :param max_num_steps: Le nombre maximum d'étape par épisode
         :type max_num_steps: int
         """
-        self.na = env.action_space.n
+        self.na = env.na
+
         self.init_replay_memory(env)
 
         # Initialisation des stats d'apprentissage

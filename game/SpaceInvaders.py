@@ -84,22 +84,44 @@ class SpaceInvaders():
         return pygame.surfarray.array3d(self.screen)
 
     def get_state(self):
-        discrete_player_X = (self.player_X//SpaceInvaders.DISCRETE_X)*SpaceInvaders.DISCRETE_X+SpaceInvaders.DISCRETE_X/2
-        discrete_invader_X = self.invader_X.map(lambda x : (x//SpaceInvaders.DISCRETE_X)*SpaceInvaders.DISCRETE_X+SpaceInvaders.DISCRETE_X/2)
-        discrete_invader_Y = self.invader_Y.map(lambda y : (y//SpaceInvaders.DISCRETE_Y)*SpaceInvaders.DISCRETE_Y+SpaceInvaders.DISCRETE_Y/2)
+        discrete_player_X = int(self.player_X//SpaceInvaders.DISCRETE_X)
+        discrete_invader_X = list(map(lambda x : (x//SpaceInvaders.DISCRETE_X), self.invader_X))
+        discrete_invader_Y = list(map(lambda y : (y//SpaceInvaders.DISCRETE_Y), self.invader_Y))
         discrete_bullet_Y = -1
         if self.bullet_state != "rest":
-            discrete_bullet_Y = (self.bullet_Y//SpaceInvaders.DISCRETE_X)*SpaceInvaders.DISCRETE_X+SpaceInvaders.DISCRETE_X/2 # On veut une bullet plus precise (meme en Y)
+            discrete_bullet_Y = int(self.bullet_Y//SpaceInvaders.DISCRETE_X) # On veut une bullet plus precise (meme en Y)
 
-        invader_right = True
-        if self.invader_Xchange < 0:
-            self.invader_right = False
-        
-        return (discrete_player_X, discrete_invader_X, discrete_invader_Y, discrete_bullet_Y, invader_right)
+        invader_right = []
+        for i in self.invader_Xchange:
+            if i < 0:
+                invader_right.append(0)
+            else:
+                invader_right.append(1)
+
+        npx, nix, niy, nby, nbool = self.get_nstate()
+
+        # nn_player_X = np.zeros([npx], dtype=np.int)
+        # nn_invader_X = np.zeros([nix], dtype=np.int)
+        # nn_invader_Y = np.zeros([niy], dtype=np.int)
+        # nn_bullet_Y = np.zeros([nby], dtype=np.int)
+        # nn_invader_right = np.zeros([nbool], dtype=np.int)
+
+        res = np.zeros([npx, nix, niy, nby, nbool], dtype=np.int)
+
+        # nn_player_X[discrete_player_X] = 1
+        # nn_bullet_Y[discrete_bullet_Y] = 1
+        for i in range (0, SpaceInvaders.NO_INVADERS):
+            # nn_invader_X[int(i*len(discrete_invader_X)+discrete_invader_X[i])] = 1
+            # nn_invader_Y[int(i*len(discrete_invader_Y)+discrete_invader_Y[i])] = 1
+            # nn_invader_right[int(i*2 + invader_right[i])] = 1
+            res[discrete_player_X][int(i*len(discrete_invader_X)+discrete_invader_X[i])][int(i*len(discrete_invader_Y)+discrete_invader_Y[i])][discrete_bullet_Y][int(i*2 + invader_right[i])] = 1
+
+
+        return res
 
     def get_nstate(self):
-        return(self.screen_width/SpaceInvaders.DISCRETE_X, (self.screen_width/SpaceInvaders.DISCRETE_X)*SpaceInvaders.NO_INVADERS, 
-            (self.screen_height/SpaceInvaders.DISCRETE_Y)*NO_INVADERS), self.screen_height/SpaceInvaders.DISCRETE_Y+1, 2)
+        return(int(self.screen_width/SpaceInvaders.DISCRETE_X), int((self.screen_width/SpaceInvaders.DISCRETE_X)*SpaceInvaders.NO_INVADERS), 
+            int((self.screen_height/SpaceInvaders.DISCRETE_Y)*SpaceInvaders.NO_INVADERS), int(self.screen_height/SpaceInvaders.DISCRETE_X+1), 2*SpaceInvaders.NO_INVADERS)
     
 
     def reset(self):
