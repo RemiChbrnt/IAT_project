@@ -8,15 +8,18 @@ class MLP(nn.Module):
         Ce constructeur crée une instance de réseau de neurones de type Multi Layer Perceptron (MLP).
         L'architecture choisie doit être choisie de façon à capter toute la complexité du problème
         sans pour autant devenir intraitable (trop de paramètres d'apprentissages). 
-        :param nstate: les parametres d'etat 
+        :param nstate: les nombres de parametres d'etat possibles
 
         :param na: Le nombre d'actions 
         :type na: int
         """
         super(MLP, self).__init__()
+        res = 1
+        for n in nstate : 
+            res = n*res
         self.flatten = nn.Flatten()
         self.layers = nn.Sequential(
-            nn.Linear(ny*nx*nf, 32),
+            nn.Linear(res, 32),
             nn.ReLU(),
             nn.Linear(32, na),
         )

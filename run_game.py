@@ -60,9 +60,9 @@ def main(nn, opt):
     """ INSTANCIE LE RESEAU DE NEURONES """
     # Hyperparamètres 
     if (nn == "mlp"):
-        model = MLP(env.get_state(), env.na)   #Max possible de states pour chaque param
+        model = MLP(env.get_nstate(), env.na)   #Max possible de states pour chaque param
     elif (nn == "cnn"):
-        model = CNN(env.get_state(), env.na)
+        model = CNN(env.get_nstate(), env.na)
     else:
         print("Error : Unknown neural network (" + nn + ").")
     
