@@ -142,18 +142,18 @@ class DQNAgent(QAgent):
 
             n_ckpt = 10
             if episode % DQNAgent.TEST_FREQUENCY == DQNAgent.TEST_FREQUENCY - 1:   
-                test_score, test_extra_steps = self.run_tests(env, 100, max_steps)
+                test_score, test_missing_steps = self.run_tests(env, 100, max_steps)
                 # train score: %.1f, mean steps: %.1f, test score: %.1f, test extra steps: %.1f,
-                #np.mean(sum_rewards[episode-(n_ckpt-1):episode+1]), np.mean(len_episode[episode-(n_ckpt-1):episode+1]), test_score, np.mean(test_extra_steps), 
+                #np.mean(sum_rewards[episode-(n_ckpt-1):episode+1]), np.mean(len_episode[episode-(n_ckpt-1):episode+1]), test_score, np.mean(test_missing_steps), 
                 print('Episode: %5d/%5d, Test success ratio: %.2f, Epsilon: %.2f, Time: %.1f'
-                      % (episode + 1, n_episodes, np.sum(test_extra_steps == 0) / 100, self.epsilon, time.time() - start_time))
+                      % (episode + 1, n_episodes, np.sum(test_missing_steps == 0) / 100, self.epsilon, time.time() - start_time))
 
         n_test_runs = 100
-        test_score, test_extra_steps = self.run_tests(env, n_test_runs, max_steps)
+        test_score, test_missing_steps = self.run_tests(env, n_test_runs, max_steps)
         # for k in range(n_test_runs):
-        #     print(test_extra_steps[k])
+        #     print(test_missing_steps[k])
         print('Final test score: %.1f' % test_score)
-        print('Final test success ratio: %.2f' % (np.sum(test_extra_steps == 0) / n_test_runs))
+        print('Final test success ratio: %.2f' % (np.sum(test_missing_steps == 0) / n_test_runs))
 
     def updateQ(self, state, action, reward, next_state, terminal):
         """ Cette méthode utilise une transition pour mettre à jour la fonction de valeur Q de l'agent. 
@@ -222,7 +222,7 @@ class DQNAgent(QAgent):
 
     def run_tests(self, env, n_runs, max_steps):
         test_score = 0.
-        extra_steps = np.zeros((n_runs, 2))
+        missing_steps = np.zeros((n_runs, 2))
         for k in range(n_runs):
             s = env.reset()
             for t in range(max_steps):
@@ -234,7 +234,7 @@ class DQNAgent(QAgent):
                 if terminal:
                     break
                 s = sn
-            extra_steps[k] = t + 1 - env.shortest_length, env.shortest_length
-        order = extra_steps[:, 0].argsort()
-        extra_steps = extra_steps[order]
-        return test_score / n_runs, extra_steps
+            missing_steps[k] = 100 - t + 1, 100
+        order = missing_steps[:, 0].argsort()
+        missing_steps = missing_steps[order]
+        return test_score / n_runs, missing_steps

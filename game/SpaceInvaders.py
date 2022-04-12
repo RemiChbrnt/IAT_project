@@ -20,8 +20,8 @@ def getURL(filename):
 class SpaceInvaders():
 
     NO_INVADERS = 1 # Nombre d'aliens  
-    DISCRETE_X = 50  # Discretisation en largeur
-    DISCRETE_Y = 100 # Discretisation en hauteur
+    DISCRETE_X = 200  # Discretisation en largeur
+    DISCRETE_Y = 200 # Discretisation en hauteur
     
     def __init__(self, display : bool = False):
         # player
@@ -99,7 +99,6 @@ class SpaceInvaders():
                 invader_right.append(1)
 
         npx, nix, niy, nby, nbool = self.get_nstate()
-
         # nn_player_X = np.zeros([npx], dtype=np.int)
         # nn_invader_X = np.zeros([nix], dtype=np.int)
         # nn_invader_Y = np.zeros([niy], dtype=np.int)
@@ -120,8 +119,8 @@ class SpaceInvaders():
         return res
 
     def get_nstate(self):
-        return(int(self.screen_width/SpaceInvaders.DISCRETE_X), int((self.screen_width/SpaceInvaders.DISCRETE_X)*SpaceInvaders.NO_INVADERS), 
-            int((self.screen_height/SpaceInvaders.DISCRETE_Y)*SpaceInvaders.NO_INVADERS), int(self.screen_height/SpaceInvaders.DISCRETE_X+1), 2*SpaceInvaders.NO_INVADERS)
+        return(int(self.screen_width/SpaceInvaders.DISCRETE_X), int(((self.screen_width/SpaceInvaders.DISCRETE_X))*SpaceInvaders.NO_INVADERS), 
+            int(((self.screen_height/SpaceInvaders.DISCRETE_Y))*SpaceInvaders.NO_INVADERS), int(self.screen_height/SpaceInvaders.DISCRETE_X+1), 2*SpaceInvaders.NO_INVADERS)
     
 
     def reset(self):
