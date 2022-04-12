@@ -3,11 +3,12 @@ from torch import nn
 import numpy as np
 
 class MLP(nn.Module):
-    def __init__(self, ny: int, nx: int, nf: int, na: int):
+    def __init__(self, nstate: list, na: int):
         """À MODIFIER QUAND NÉCESSAIRE.
         Ce constructeur crée une instance de réseau de neurones de type Multi Layer Perceptron (MLP).
         L'architecture choisie doit être choisie de façon à capter toute la complexité du problème
         sans pour autant devenir intraitable (trop de paramètres d'apprentissages). 
+        :param nstate: les parametres d'etat 
 
         :param na: Le nombre d'actions 
         :type na: int

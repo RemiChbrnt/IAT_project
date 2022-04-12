@@ -20,6 +20,8 @@ def getURL(filename):
 class SpaceInvaders():
 
     NO_INVADERS = 1 # Nombre d'aliens  
+    DISCRETE_X = 50  # Discretisation en largeur
+    DISCRETE_Y = 100 # Discretisation en hauteur
     
     def __init__(self, display : bool = False):
         # player
@@ -82,7 +84,23 @@ class SpaceInvaders():
         return pygame.surfarray.array3d(self.screen)
 
     def get_state(self):
-        return (self.player_X, self.invader_X, self.bullet_state)
+        discrete_player_X = (self.player_X//SpaceInvaders.DISCRETE_X)*SpaceInvaders.DISCRETE_X+SpaceInvaders.DISCRETE_X/2
+        discrete_invader_X = self.invader_X.map(lambda x : (x//SpaceInvaders.DISCRETE_X)*SpaceInvaders.DISCRETE_X+SpaceInvaders.DISCRETE_X/2)
+        discrete_invader_Y = self.invader_Y.map(lambda y : (y//SpaceInvaders.DISCRETE_Y)*SpaceInvaders.DISCRETE_Y+SpaceInvaders.DISCRETE_Y/2)
+        discrete_bullet_Y = -1
+        if self.bullet_state != "rest":
+            discrete_bullet_Y = (self.bullet_Y//SpaceInvaders.DISCRETE_X)*SpaceInvaders.DISCRETE_X+SpaceInvaders.DISCRETE_X/2 # On veut une bullet plus precise (meme en Y)
+
+        invader_right = True
+        if self.invader_Xchange < 0:
+            self.invader_right = False
+        
+        return (discrete_player_X, discrete_invader_X, discrete_invader_Y, discrete_bullet_Y, invader_right)
+
+    def get_nstate(self):
+        return(self.screen_width/SpaceInvaders.DISCRETE_X, (self.screen_width/SpaceInvaders.DISCRETE_X)*SpaceInvaders.NO_INVADERS, 
+            (self.screen_height/SpaceInvaders.DISCRETE_Y)*NO_INVADERS), self.screen_height/SpaceInvaders.DISCRETE_Y+1, 2)
+    
 
     def reset(self):
         """Reset the game at the initial state.

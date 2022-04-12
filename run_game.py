@@ -3,8 +3,10 @@ import time
 
 from game.SpaceInvaders import SpaceInvaders
 from controller.keyboard import KeyboardController
-from agent.dqn_agent import DQNAgent
+from controller.dqn_agent import DQNAgent
 from controller.random_agent import RandomAgent
+from epsilon_profile import EpsilonProfile
+
 
 from networks.networks import MLP, CNN
 
@@ -58,7 +60,7 @@ def main(nn, opt):
     """ INSTANCIE LE RESEAU DE NEURONES """
     # Hyperparamètres 
     if (nn == "mlp"):
-        model = MLP(env.get_state(), env.na)
+        model = MLP(env.get_state(), env.na)   #Max possible de states pour chaque param
     elif (nn == "cnn"):
         model = CNN(env.get_state(), env.na)
     else:

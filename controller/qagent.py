@@ -1,5 +1,5 @@
 import numpy as np
-from agent import AgentInterface
+from controller import AgentInterface
 from game.SpaceInvaders import SpaceInvaders
 from epsilon_profile import EpsilonProfile
 import pandas as pd
@@ -140,7 +140,7 @@ class QAgent(AgentInterface):
         """Sauvegarde les données d'apprentissage.
         :warning: Vous n'avez pas besoin de comprendre cette méthode
         """
-        state = space.reset())
+        state = space.reset()
         # Construit la fonction de valeur d'état associée à Q
         V = np.zeros((int(self.maze.ny), int(self.maze.nx)))
         for state in self.maze.getStates():
