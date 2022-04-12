@@ -19,7 +19,7 @@ def getURL(filename):
 
 class SpaceInvaders():
 
-    NO_INVADERS = 5 # Nombre d'aliens  
+    NO_INVADERS = 1 # Nombre d'aliens  
     
     def __init__(self, display : bool = False):
         # player
@@ -82,7 +82,7 @@ class SpaceInvaders():
         return pygame.surfarray.array3d(self.screen)
 
     def get_state(self):
-        return (player_X, invader_X, bullet_state)
+        return (self.player_X, self.invader_X, self.bullet_state)
 
     def reset(self):
         """Reset the game at the initial state.
