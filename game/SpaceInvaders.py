@@ -123,7 +123,7 @@ class SpaceInvaders():
 
     def step(self, action):
         """Execute une action et renvoir l'état suivant, la récompense perçue 
-        et un booléen indiquant si la partie est terminée ou non.
+        est un booléen indiquant si la partie est terminée ou non.
         """
         is_done = False
         reward = 0
@@ -173,7 +173,7 @@ class SpaceInvaders():
             # Collision
             collision = self.isCollision(self.bullet_X, self.invader_X[i], self.bullet_Y, self.invader_Y[i])
             if collision:
-                reward = 1
+                reward = 1 #donner un meilleur reward (si possible) plus l'ennemi est bas 
                 self.score_val += 1
                 self.bullet_Y = 600
                 self.bullet_state = "rest"
