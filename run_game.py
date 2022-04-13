@@ -11,21 +11,19 @@ from epsilon_profile import EpsilonProfile
 from networks.networks import MLP, CNN
 
 
-def test_space(env: SpaceInvaders, agent: DQNAgent, max_steps: int, nepisodes : int = 1, speed: float = 0., same = True, display: bool = False):
+def test_space(agent: DQNAgent, max_steps: int, nepisodes : int = 1, speed: float = 0.001, display: bool = True):
     n_steps = max_steps
+    env = SpaceInvaders(display = display)
+    print("let's gooooooooooooooooooooooooooooooooooo")
     sum_rewards = 0.
     for _ in range(nepisodes):
-        state = env.reset() if (same) else env.reset()
-        if display:
-            env.render()
+        state = env.reset()
 
         for step in range(max_steps):
             action = agent.select_greedy_action(state)
             next_state, reward, terminal = env.step(action)
 
-            if display:
-                time.sleep(speed)
-                env.render()
+            time.sleep(speed)
 
             sum_rewards += reward
             if terminal:
@@ -45,14 +43,14 @@ def main(nn, opt):
 
     """ INITIALISE LES PARAMETRES D'APPRENTISSAGE """
     # Hyperparamètres basiques
-    n_episodes = 2000
-    max_steps = 50
-    alpha = 0.001
+    n_episodes = 50
+    max_steps = 10000
+    alpha = 1
     eps_profile = EpsilonProfile(1.0, 0.1)
-    final_exploration_episode = 500
+    final_exploration_episode = 10
 
     # Hyperparamètres de DQN
-    batch_size = 32
+    batch_size = 10
     replay_memory_size = 1000
     target_update_frequency = 100
     tau = 1.0
@@ -75,7 +73,7 @@ def main(nn, opt):
     """  LEARNING PARAMETERS"""
     agent = DQNAgent(model, eps_profile, gamma, alpha, replay_memory_size, batch_size, target_update_frequency, tau, final_exploration_episode)
     agent.learn(env, n_episodes, max_steps)
-    test_space(env, agent, max_steps=200, nepisodes=10, speed=0.1, display=True)
+    test_space(agent = agent, max_steps=15000, nepisodes=10, speed=0.001, display=True)
 
 if __name__ == '__main__':
     """ Usage : python main.py [ARGS]

@@ -17,6 +17,7 @@ class DQNAgent(QAgent):
     à jour sa politique d'action.
     """
     TEST_FREQUENCY = 100
+    steps_goal = 8000
 
     def __init__(self, qnetwork: nn.Module, eps_profile: EpsilonProfile, gamma: float, alpha: float, replay_memory_size: int = 1000, batch_size: int = 32, target_update_freq: int = 100, tau: float = 1., final_exploration_episode : int = 500):
         """
@@ -234,7 +235,7 @@ class DQNAgent(QAgent):
                 if terminal:
                     break
                 s = sn
-            missing_steps[k] = 100 - t + 1, 100
+            missing_steps[k] = DQNAgent.steps_goal - t + 1, DQNAgent.steps_goal
         order = missing_steps[:, 0].argsort()
         missing_steps = missing_steps[order]
         return test_score / n_runs, missing_steps
