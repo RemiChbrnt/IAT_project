@@ -17,7 +17,7 @@ class DQNAgent(QAgent):
     à jour sa politique d'action.
     """
     TEST_FREQUENCY = 100
-    steps_goal = 8000
+    INVADERS_GOAL = 1
 
     def __init__(self, qnetwork: nn.Module, eps_profile: EpsilonProfile, gamma: float, alpha: float, replay_memory_size: int = 1000, batch_size: int = 32, target_update_freq: int = 100, tau: float = 1., final_exploration_episode : int = 500):
         """
@@ -143,18 +143,18 @@ class DQNAgent(QAgent):
 
             n_ckpt = 10
             if episode % DQNAgent.TEST_FREQUENCY == DQNAgent.TEST_FREQUENCY - 1:   
-                test_score, test_missing_steps = self.run_tests(env, 100, max_steps)
+                test_score, test_invaders_killed = self.run_tests(env, 100, max_steps)
                 # train score: %.1f, mean steps: %.1f, test score: %.1f, test extra steps: %.1f,
                 #np.mean(sum_rewards[episode-(n_ckpt-1):episode+1]), np.mean(len_episode[episode-(n_ckpt-1):episode+1]), test_score, np.mean(test_missing_steps), 
                 print('Episode: %5d/%5d, Test success ratio: %.2f, Epsilon: %.2f, Time: %.1f'
-                      % (episode + 1, n_episodes, np.sum(test_missing_steps <= 0) / 100, self.epsilon, time.time() - start_time))
+                      % (episode + 1, n_episodes, np.sum(test_invaders_killed >= DQNAgent.INVADERS_GOAL) / 100, self.epsilon, time.time() - start_time))
 
         n_test_runs = 100
-        test_score, test_missing_steps = self.run_tests(env, n_test_runs, max_steps)
+        test_score, test_invaders_killed = self.run_tests(env, n_test_runs, max_steps)
         # for k in range(n_test_runs):
         #     print(test_missing_steps[k])
         print('Final test score: %.1f' % test_score)
-        print('Final test success ratio: %.2f' % (np.sum(test_missing_steps <= 0) / n_test_runs))
+        print('Final test success ratio: %.2f' % (np.sum(test_invaders_killed >= DQNAgent.INVADERS_GOAL) / n_test_runs))
 
     def updateQ(self, state, action, reward, next_state, terminal):
         """ Cette méthode utilise une transition pour mettre à jour la fonction de valeur Q de l'agent. 
@@ -223,19 +223,20 @@ class DQNAgent(QAgent):
 
     def run_tests(self, env, n_runs, max_steps):
         test_score = 0.
-        missing_steps = np.zeros((n_runs, 2))
+        invader_killed = np.zeros(n_runs)
         for k in range(n_runs):
             s = env.reset()
+            run_kills = 0
             for t in range(max_steps):
                 q = self.policy_net(torch.FloatTensor(s).unsqueeze(0))
                 # greedy action with random tie break
                 a = np.random.choice(np.where(q[0] == q[0].max())[0])
                 sn, r, terminal = env.step(a)
                 test_score += r
+                run_kills += r
+
                 if terminal:
                     break
                 s = sn
-            missing_steps[k] = DQNAgent.steps_goal - t + 1, DQNAgent.steps_goal
-        order = missing_steps[:, 0].argsort()
-        missing_steps = missing_steps[order]
-        return test_score / n_runs, missing_steps
+            invader_killed[k] = run_kills
+        return test_score / n_runs, invader_killed

@@ -19,6 +19,8 @@ class MLP(nn.Module):
         self.layers = nn.Sequential(
             nn.Linear(sum(nstate), 32),
             nn.ReLU(),
+            nn.Linear(32, 32),
+            nn.ReLU(),
             nn.Linear(32, na),
         )
 

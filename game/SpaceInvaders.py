@@ -20,8 +20,8 @@ def getURL(filename):
 class SpaceInvaders():
 
     NO_INVADERS = 1 # Nombre d'aliens  
-    DISCRETE_X = 200  # Discretisation en largeur
-    DISCRETE_Y = 200 # Discretisation en hauteur
+    DISCRETE_X = 100  # Discretisation en largeur
+    DISCRETE_Y = 100 # Discretisation en hauteur
     
     def __init__(self, display : bool = False):
         # player

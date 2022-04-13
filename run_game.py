@@ -39,19 +39,19 @@ def main(nn, opt):
     env = SpaceInvaders(display = False)
     # env.mode = "nn" 
     model = None
-    gamma = 1.
+    gamma = 0.01
 
     """ INITIALISE LES PARAMETRES D'APPRENTISSAGE """
     # Hyperparamètres basiques
-    n_episodes = 50
-    max_steps = 10000
+    n_episodes = 100
+    max_steps = 2000
     alpha = 1
     eps_profile = EpsilonProfile(1.0, 0.1)
-    final_exploration_episode = 10
+    final_exploration_episode = 100
 
     # Hyperparamètres de DQN
-    batch_size = 10
-    replay_memory_size = 1000
+    batch_size = 300
+    replay_memory_size = 2000
     target_update_frequency = 100
     tau = 1.0
 
@@ -73,7 +73,7 @@ def main(nn, opt):
     """  LEARNING PARAMETERS"""
     agent = DQNAgent(model, eps_profile, gamma, alpha, replay_memory_size, batch_size, target_update_frequency, tau, final_exploration_episode)
     agent.learn(env, n_episodes, max_steps)
-    test_space(agent = agent, max_steps=15000, nepisodes=10, speed=0.001, display=True)
+    test_space(agent, max_steps=15000, nepisodes=10, speed=0.001, display=True)
 
 if __name__ == '__main__':
     """ Usage : python main.py [ARGS]
