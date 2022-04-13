@@ -75,7 +75,7 @@ def main(nn, opt):
     """  LEARNING PARAMETERS"""
     agent = DQNAgent(model, eps_profile, gamma, alpha, replay_memory_size, batch_size, target_update_frequency, tau, final_exploration_episode)
     agent.learn(env, n_episodes, max_steps)
-    test_space(env, agent, max_steps=15, nepisodes=10, speed=0.1, display=True)
+    test_space(env, agent, max_steps=200, nepisodes=10, speed=0.1, display=True)
 
 if __name__ == '__main__':
     """ Usage : python main.py [ARGS]

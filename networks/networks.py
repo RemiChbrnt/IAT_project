@@ -14,12 +14,10 @@ class MLP(nn.Module):
         :type na: int
         """
         super(MLP, self).__init__()
-        res = 1
-        for n in nstate : 
-            res = n*res
+
         self.flatten = nn.Flatten()
         self.layers = nn.Sequential(
-            nn.Linear(res, 32),
+            nn.Linear(sum(nstate), 32),
             nn.ReLU(),
             nn.Linear(32, na),
         )

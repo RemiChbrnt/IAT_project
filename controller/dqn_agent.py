@@ -72,11 +72,11 @@ class DQNAgent(QAgent):
         """
         npx, nix, niy, nby, nbool = env.get_nstate()
         # Replay memory pour s, a, r, terminal, and sn
-        self.Ds = np.zeros([self.replay_memory_size, npx, nix, niy, nby, nbool], dtype=np.float32)
+        self.Ds = np.zeros([self.replay_memory_size, npx+nix+niy+nby+nbool], dtype=np.float32)
         self.Da = np.zeros([self.replay_memory_size, env.na], dtype=np.float32)
         self.Dr = np.zeros([self.replay_memory_size], dtype=np.float32)
         self.Dt = np.zeros([self.replay_memory_size], dtype=np.float32)
-        self.Dsn = np.zeros([self.replay_memory_size, npx, nix, niy, nby, nbool], dtype=np.float32)
+        self.Dsn = np.zeros([self.replay_memory_size, npx+nix+niy+nby+nbool], dtype=np.float32)
 
         self.d = 0     # counter for storing in D
         self.ds = 0    # total number of steps
@@ -87,7 +87,7 @@ class DQNAgent(QAgent):
 
         :param env: L'environnement 
         :type env: gym.Env
-        :param num_episodes: Le nombre d'épisode
+        :param num_episodes: Le nombre d'épisodes
         :type num_episodes: int
         :param max_num_steps: Le nombre maximum d'étape par épisode
         :type max_num_steps: int
@@ -119,12 +119,12 @@ class DQNAgent(QAgent):
                 sum_rewards[episode] += reward
                 len_episode[episode] += 1
 
-                # Mets à jour la fonction de valeur Q
-                self.updateQ(state, action, reward, next_state, terminal)
-
                 if terminal:
                     n_steps[episode] = step + 1  # number of steps taken
                     break
+
+                # Mets à jour la fonction de valeur Q
+                self.updateQ(state, action, reward, next_state, terminal)
 
                 state = next_state
 
@@ -146,14 +146,14 @@ class DQNAgent(QAgent):
                 # train score: %.1f, mean steps: %.1f, test score: %.1f, test extra steps: %.1f,
                 #np.mean(sum_rewards[episode-(n_ckpt-1):episode+1]), np.mean(len_episode[episode-(n_ckpt-1):episode+1]), test_score, np.mean(test_missing_steps), 
                 print('Episode: %5d/%5d, Test success ratio: %.2f, Epsilon: %.2f, Time: %.1f'
-                      % (episode + 1, n_episodes, np.sum(test_missing_steps == 0) / 100, self.epsilon, time.time() - start_time))
+                      % (episode + 1, n_episodes, np.sum(test_missing_steps <= 0) / 100, self.epsilon, time.time() - start_time))
 
         n_test_runs = 100
         test_score, test_missing_steps = self.run_tests(env, n_test_runs, max_steps)
         # for k in range(n_test_runs):
         #     print(test_missing_steps[k])
         print('Final test score: %.1f' % test_score)
-        print('Final test success ratio: %.2f' % (np.sum(test_missing_steps == 0) / n_test_runs))
+        print('Final test success ratio: %.2f' % (np.sum(test_missing_steps <= 0) / n_test_runs))
 
     def updateQ(self, state, action, reward, next_state, terminal):
         """ Cette méthode utilise une transition pour mettre à jour la fonction de valeur Q de l'agent. 
