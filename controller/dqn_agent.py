@@ -13,38 +13,37 @@ from epsilon_profile import EpsilonProfile
 
 class DQNAgent(QAgent):
     """ 
-    Cette classe d'agent représente un agent utilisant l'algorithme DQN pour mettre 
-    à jour sa politique d'action.
+    This class represents the Deep Q-Network agent with his policy.
     """
     TEST_FREQUENCY = 100
     INVADERS_GOAL = 1
 
-    def __init__(self, qnetwork: nn.Module, eps_profile: EpsilonProfile, gamma: float, alpha: float, replay_memory_size: int = 1000, batch_size: int = 32, target_update_freq: int = 100, tau: float = 1., final_exploration_episode : int = 500):
+    def __init__(self, qnetwork: nn.Module, eps_profile: EpsilonProfile, gamma: float, alpha: float,
+                 replay_memory_size: int = 1000, batch_size: int = 32, target_update_freq: int = 100, tau: float = 1.,
+                 final_exploration_episode: int = 500):
         """
-        Ce constructeur initialise une nouvelle instance de la classe QAgent.
-        Il doit stocker les différents paramètres nécessaires au fonctionnement 
-        de l'algorithme et initialiser la fonction de valeur d'action, notée Q.
+        This constructor create the QAgent. It has to stock the different parameters for algorithm operations
+        and initialise Q, the value of action function.
 
-        :param SpaceInvaders: Le labyrinthe à résoudre 
+        :param SpaceInvaders: the game to finish
         :type SpaceInvaders: SpaceInvaders
-        :param eps_profile: Le profil du paramètre d'exploration epsilon 
+        :param eps_profile: the exploration parameter profile (epsilon)
         :type eps_profile: EpsilonProfile
-        :param gamma: Le facteur d'atténuation
+        :param gamma: attenuation factor
         :type gamma: float
-        :param alpha: Le taux d'apprentissage
+        :param alpha: learning rate
         :type alpha: float
-        :param tau: Le taux de mise à jour du réseau cible
+        :param tau: update rate of target network
         :type tau: float
-        :param target_update_frequency: La fréquence de mise à jour du réseau cible
+        :param target_update_frequency: update frequency of the target network
         :type target_update_frequency: int
-        :param batch_size: La taille de l'échantillon utilisé pour la mise à jour du 
-        réseau Q
+        :param batch_size: the size of the sample used for the Q network update
         :type batch_size: int
         """
         self.policy_net = qnetwork
         self.target_net = copy.deepcopy(qnetwork)
 
-        # Paramètres d'apprentissage
+        # Learning parameters
         self.alpha = alpha
         self.gamma = gamma
         self.replay_memory_size = replay_memory_size
@@ -52,17 +51,17 @@ class DQNAgent(QAgent):
         self.target_update_frequency = target_update_freq
         self.tau = tau
 
-        # Profil du Epsilon
+        # Epsilon profile
         self.eps_profile = eps_profile
         self.epsilon = self.eps_profile.initial
         self.init_epsilon = self.eps_profile.initial
         self.final_epsilon = self.eps_profile.final
         self.final_exploration_episode = final_exploration_episode
 
-        # Cirtère d'optimisation
+        # Optimisation criterion
         self.criterion = nn.MSELoss()
 
-        # Méthode de descente de gradient
+        # Gradient descent method
         self.optimizer = optim.Adam(self.policy_net.parameters(), lr=self.alpha)
 
     def init_replay_memory(self, env: SpaceInvaders):
@@ -73,14 +72,14 @@ class DQNAgent(QAgent):
         """
         npx, nix, niy, nby, nbool = env.get_nstate()
         # Replay memory pour s, a, r, terminal, and sn
-        self.Ds = np.zeros([self.replay_memory_size, npx+nix+niy+nby+nbool], dtype=np.float32)
+        self.Ds = np.zeros([self.replay_memory_size, npx + nix + niy + nby + nbool], dtype=np.float32)
         self.Da = np.zeros([self.replay_memory_size, env.na], dtype=np.float32)
         self.Dr = np.zeros([self.replay_memory_size], dtype=np.float32)
         self.Dt = np.zeros([self.replay_memory_size], dtype=np.float32)
-        self.Dsn = np.zeros([self.replay_memory_size, npx+nix+niy+nby+nbool], dtype=np.float32)
+        self.Dsn = np.zeros([self.replay_memory_size, npx + nix + niy + nby + nbool], dtype=np.float32)
 
-        self.d = 0     # counter for storing in D
-        self.ds = 0    # total number of steps
+        self.d = 0  # counter for storing in D
+        self.ds = 0  # total number of steps
 
     def learn(self, env, n_episodes, max_steps):
         """Cette méthode exécute l'algorithme de q-learning. 
@@ -142,12 +141,13 @@ class DQNAgent(QAgent):
                     self.hard_update()
 
             n_ckpt = 10
-            if episode % DQNAgent.TEST_FREQUENCY == DQNAgent.TEST_FREQUENCY - 1:   
+            if episode % DQNAgent.TEST_FREQUENCY == DQNAgent.TEST_FREQUENCY - 1:
                 test_score, test_invaders_killed = self.run_tests(env, 100, max_steps)
                 # train score: %.1f, mean steps: %.1f, test score: %.1f, test extra steps: %.1f,
-                #np.mean(sum_rewards[episode-(n_ckpt-1):episode+1]), np.mean(len_episode[episode-(n_ckpt-1):episode+1]), test_score, np.mean(test_missing_steps), 
+                # np.mean(sum_rewards[episode-(n_ckpt-1):episode+1]), np.mean(len_episode[episode-(n_ckpt-1):episode+1]), test_score, np.mean(test_missing_steps),
                 print('Episode: %5d/%5d, Test success ratio: %.2f, Epsilon: %.2f, Time: %.1f'
-                      % (episode + 1, n_episodes, np.sum(test_invaders_killed >= DQNAgent.INVADERS_GOAL) / 100, self.epsilon, time.time() - start_time))
+                      % (episode + 1, n_episodes, np.sum(test_invaders_killed >= DQNAgent.INVADERS_GOAL) / 100,
+                         self.epsilon, time.time() - start_time))
 
         n_test_runs = 100
         test_score, test_invaders_killed = self.run_tests(env, n_test_runs, max_steps)
@@ -178,7 +178,6 @@ class DQNAgent(QAgent):
 
         # Commence l'apprentissage quand le buffer est plein
         if self.ds >= self.replay_memory_size:
-
             self.optimizer.zero_grad()
 
             # Sélectionne des indices aléatoires dans le buffer
@@ -186,7 +185,7 @@ class DQNAgent(QAgent):
 
             # Récupère les batch de données associés
             x_batch, a_batch, r_batch, y_batch, t_batch = torch.from_numpy(self.Ds[c]), torch.from_numpy(
-                self.Da[c]), torch.from_numpy(self.Dr[c]),  torch.from_numpy(self.Dsn[c]), torch.from_numpy(self.Dt[c])
+                self.Da[c]), torch.from_numpy(self.Dr[c]), torch.from_numpy(self.Dsn[c]), torch.from_numpy(self.Dt[c])
 
             # Calcul de la valeur courante 
             current_value = self.policy_net(x_batch).gather(1, a_batch.max(1).indices.unsqueeze(1)).squeeze(1)
@@ -219,7 +218,7 @@ class DQNAgent(QAgent):
         """ Cette fonction fait mise à jour glissante du réseau de neurones cible 
         """
         for target_param, local_param in zip(self.target_net.parameters(), self.policy_net.parameters()):
-            target_param.data.copy_(tau*local_param.data + (1.0 - tau) * target_param.data)
+            target_param.data.copy_(tau * local_param.data + (1.0 - tau) * target_param.data)
 
     def run_tests(self, env, n_runs, max_steps):
         test_score = 0.

@@ -2,22 +2,23 @@ import torch
 from torch import nn
 import numpy as np
 
+
 class MLP(nn.Module):
     def __init__(self, nstate: list, na: int):
-        """À MODIFIER QUAND NÉCESSAIRE.
-        Ce constructeur crée une instance de réseau de neurones de type Multi Layer Perceptron (MLP).
-        L'architecture choisie doit être choisie de façon à capter toute la complexité du problème
-        sans pour autant devenir intraitable (trop de paramètres d'apprentissages). 
-        :param nstate: les nombres de parametres d'etat possibles
+        """
+        This constructor create an instance of a Multi Layer Perceptron neural network.
+        The chosen architecture has to elected depending of the problem complexity without being to long to compute
+        (to many learning parameters).
 
-        :param na: Le nombre d'actions 
+        :param nstate: number of possible states parameters
+        :param na: number of actions
         :type na: int
         """
         super(MLP, self).__init__()
 
         self.flatten = nn.Flatten()
         self.layers = nn.Sequential(
-            nn.Linear(sum(nstate), 32),
+            nn.Linear(sum(nstate), 32),  # 1st parameter: layer number equal number of states
             nn.ReLU(),
             nn.Linear(32, 32),
             nn.ReLU(),
@@ -25,14 +26,15 @@ class MLP(nn.Module):
         )
 
     def forward(self, x):
-        """Cette fonction réalise un passage dans le réseau de neurones. 
+        """This function goes through the neural network.
 
-        :param x: L'état
-        :return: Le vecteur de valeurs d'actions (une valeur par action)
+        :param x: the state
+        :return: action values vector (onr value per action)
         """
         x = self.flatten(x)
         qvalues = self.layers(x)
         return qvalues
+
 
 class CNN(nn.Module):
     def __init__(self, ny: int, nx: int, nf: int, na: int):
@@ -45,7 +47,7 @@ class CNN(nn.Module):
         :type na: int
         """
         super(CNN, self).__init__()
-        
+
         self.layers = nn.Sequential(
             nn.Conv2d(nf, 32, 3, stride=1, padding="same", bias=True),
             nn.ReLU(),
@@ -66,6 +68,7 @@ class CNN(nn.Module):
         """
         qvalues = self.layers(x)
         return qvalues
+
 
 def weights_init(m):
     if isinstance(m, nn.Conv2d):
